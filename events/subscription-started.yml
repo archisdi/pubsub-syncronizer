@@ -1,7 +1,0 @@
-topic: subscription-started
-subscribers:
-  - service: rey-auth
-    is_active: true
-  - service: rey-purchase
-    is_active: true
-is_active: true

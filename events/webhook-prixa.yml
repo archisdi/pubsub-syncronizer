@@ -1,5 +1,0 @@
-topic: webhook-prixa
-subscribers:
-  - service: rey-purchase
-    is_active: true
-is_active: true

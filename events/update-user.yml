@@ -1,5 +1,0 @@
-topic: update-user
-subscribers:
-  - service: rey-auth
-    is_active: true
-is_active: true

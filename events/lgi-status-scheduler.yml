@@ -1,5 +1,0 @@
-topic: lgi-status-scheduler
-subscribers:
-  - service: rey-purchase
-    is_active: true
-is_active: true

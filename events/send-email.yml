@@ -1,6 +1,6 @@
 topic: send-email
 subscribers:
-  - service: rey-notif
+  - service: notification
     dead_letter: 5
     deadline: 10
     retry: 10,600
