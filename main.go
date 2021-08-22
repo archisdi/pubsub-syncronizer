@@ -53,6 +53,15 @@ func main() {
 		logErrorAndExit(errEvents)
 	}
 
+	// enforce dead letter topic
+	deadLetter := model.Event{
+		Topic: "dead-letter",
+		Subscribers: []model.Subscriber{{
+			Service: "handler",
+		}},
+	}
+	deadLetter.Sync()
+
 	for _, event := range events {
 		if errSync := event.Sync(); errSync != nil {
 			logErrorAndExit(errSync)

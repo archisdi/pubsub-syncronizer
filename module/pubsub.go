@@ -15,7 +15,7 @@ var Pubsub PubsubClient
 
 func InitializePubsubClient() error {
 	ctx := context.Background()
-	projectID := os.Getenv("PROJECT_ID")
+	projectID := os.Getenv("PUBSUB_PROJECT_ID")
 
 	client, err := pubsub.NewClient(ctx, projectID)
 	if err != nil {

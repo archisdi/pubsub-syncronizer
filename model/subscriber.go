@@ -3,6 +3,7 @@ package model
 import (
 	"context"
 	"fmt"
+	"os"
 	"reypubsub/module"
 	"strings"
 	"time"
@@ -26,7 +27,8 @@ func (s *Subscriber) createConfig(topic *pubsub.Topic) pubsub.SubscriptionConfig
 	}
 
 	if s.Deadline != nil {
-		config.AckDeadline = time.Duration(*s.Deadline)
+		ackDeadline := time.Duration(*s.Deadline * int(time.Second))
+		config.AckDeadline = ackDeadline
 	}
 
 	if s.Ordering != nil {
@@ -34,16 +36,17 @@ func (s *Subscriber) createConfig(topic *pubsub.Topic) pubsub.SubscriptionConfig
 	}
 
 	if s.DeadLetter != nil {
+		projectId := os.Getenv("PUBSUB_PROJECT_ID")
 		config.DeadLetterPolicy = &pubsub.DeadLetterPolicy{
-			DeadLetterTopic:     "dead-letter",
+			DeadLetterTopic:     "projects/" + projectId + "/topics/dead-letter",
 			MaxDeliveryAttempts: *s.DeadLetter,
 		}
 	}
 
 	if s.Retry != nil {
 		val := strings.Split(*s.Retry, ",")
-		min, _ := time.ParseDuration(val[0])
-		max, _ := time.ParseDuration(val[1])
+		min, _ := time.ParseDuration(val[0] + "s")
+		max, _ := time.ParseDuration(val[1] + "s")
 		config.RetryPolicy = &pubsub.RetryPolicy{
 			MinimumBackoff: min,
 			MaximumBackoff: max,
