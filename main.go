@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -19,6 +18,7 @@ func loadEvents() ([]Event, error) {
 		if errYaml != nil {
 			return nil, errYaml
 		}
+
 		var event Event
 		errMarshal := yaml.Unmarshal(yamlFile, &event)
 		if errMarshal != nil {
@@ -52,7 +52,6 @@ func main() {
 	}
 
 	for _, event := range events {
-		fmt.Println(event)
 		if errSync := event.Sync(); errSync != nil {
 			logErrorAndExit(errSync)
 		}
