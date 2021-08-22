@@ -54,10 +54,11 @@ func main() {
 	}
 
 	// enforce dead letter topic
+	deadLetterPrefix := "handler"
 	deadLetter := model.Event{
 		Topic: "dead-letter",
 		Subscribers: []model.Subscriber{{
-			Service: "handler",
+			Service: &deadLetterPrefix,
 		}},
 	}
 	deadLetter.Sync()

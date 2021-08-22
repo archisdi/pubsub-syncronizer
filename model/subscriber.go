@@ -2,6 +2,7 @@ package model
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"reypubsub/module"
@@ -12,7 +13,8 @@ import (
 )
 
 type Subscriber struct {
-	Service    string  `yaml:"service"`
+	Service    *string `yaml:"service"`
+	Name       *string `yaml:"name"`
 	DeadLetter *int    `yaml:"dead_letter"`
 	Deadline   *int    `yaml:"deadline"`
 	Retry      *string `yaml:"retry"`
@@ -41,6 +43,18 @@ func (s *Subscriber) getRetryPolicy() *pubsub.RetryPolicy {
 
 func (s *Subscriber) getAckDeadline() time.Duration {
 	return time.Duration(*s.Deadline * int(time.Second))
+}
+
+func (s *Subscriber) getSubscriptionName(topicName string) (string, error) {
+	if s.Service == nil && s.Name == nil {
+		return "", errors.New("subscription name or service must exist")
+	}
+
+	if s.Name != nil {
+		return *s.Name, nil
+	}
+
+	return *s.Service + "-" + topicName, nil
 }
 
 func (s *Subscriber) createConfig(topic *pubsub.Topic) pubsub.SubscriptionConfig {
@@ -88,27 +102,31 @@ func (s *Subscriber) createUpdateConfig() pubsub.SubscriptionConfigToUpdate {
 func (s *Subscriber) Sync(topic *pubsub.Topic) error {
 	var subscription *pubsub.Subscription
 	context := context.Background()
-	subName := s.Service + "-" + topic.ID()
 
-	subscription = module.Pubsub.Client.Subscription(subName)
+	subscriptionName, err := s.getSubscriptionName(topic.ID())
+	if err != nil {
+		return err
+	}
+
+	subscription = module.Pubsub.Client.Subscription(subscriptionName)
 	isExist, err := subscription.Exists(context)
 	if err != nil {
 		return err
 	}
 
 	if !isExist && s.IsActive {
-		fmt.Println("creating new subscription " + subName)
-		if _, err := module.Pubsub.Client.CreateSubscription(context, subName, s.createConfig(topic)); err != nil {
+		fmt.Println("creating new subscription " + subscriptionName)
+		if _, err := module.Pubsub.Client.CreateSubscription(context, subscriptionName, s.createConfig(topic)); err != nil {
 			return err
 		}
 	} else if isExist && s.IsActive {
-		fmt.Print("updating subscription " + subName)
+		fmt.Print("updating subscription " + subscriptionName)
 		if _, err := subscription.Update(context, s.createUpdateConfig()); err != nil {
 			fmt.Print(" (skipped)")
 		}
 		fmt.Println()
 	} else if isExist && !s.IsActive {
-		fmt.Println("deleting subscription " + subName)
+		fmt.Println("deleting subscription " + subscriptionName)
 		if err := subscription.Delete(context); err != nil {
 			return err
 		}
