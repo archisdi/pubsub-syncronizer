@@ -24,6 +24,7 @@ func (e *Event) Sync() error {
 		return err
 	}
 
+	fmt.Println()
 	if !isExist {
 		fmt.Println("creating new topic " + e.Topic)
 		_, errCreateTopic := module.Pubsub.Client.CreateTopic(context, e.Topic)
