@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 type Subscriber struct {
 	Service    string `yaml:"service"`
 	DeadLetter int    `yaml:"dead_letter"`
@@ -22,6 +24,10 @@ func (e *Event) Sync() error {
 	// if not, create topic
 
 	return e.syncSubscribers()
+}
+
+func (e Event) String() string {
+	return e.Topic + ", has " + fmt.Sprint(len(e.Subscribers)) + " subscriber(s)"
 }
 
 func (e *Event) syncSubscribers() error {
