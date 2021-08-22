@@ -4,13 +4,15 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"reypubsub/model"
+	"reypubsub/module"
 
 	"github.com/joho/godotenv"
 	"gopkg.in/yaml.v2"
 )
 
-func loadEvents() ([]Event, error) {
-	var events []Event
+func loadEvents() ([]model.Event, error) {
+	var events []model.Event
 	files, _ := ioutil.ReadDir("./events")
 
 	for _, file := range files {
@@ -19,7 +21,7 @@ func loadEvents() ([]Event, error) {
 			return nil, errYaml
 		}
 
-		var event Event
+		var event model.Event
 		errMarshal := yaml.Unmarshal(yamlFile, &event)
 		if errMarshal != nil {
 			return nil, errMarshal
@@ -42,7 +44,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	if errClient := InitializePubsubClient(); errClient != nil {
+	if errClient := module.InitializePubsubClient(); errClient != nil {
 		logErrorAndExit(errClient)
 	}
 

@@ -1,10 +1,9 @@
-module rey-pubsub
+module reypubsub
 
 go 1.16
 
 require (
 	cloud.google.com/go/pubsub v1.15.0
-	github.com/joho/godotenv v1.3.0 // indirect
-	google.golang.org/api v0.54.0 // indirect
-	gopkg.in/yaml.v2 v2.4.0 // indirect
+	github.com/joho/godotenv v1.3.0
+	gopkg.in/yaml.v2 v2.4.0
 )
