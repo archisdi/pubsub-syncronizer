@@ -1,26 +1,21 @@
 package main
 
 import (
-	"context"
-	"fmt"
+	"log"
 	"os"
 
-	"cloud.google.com/go/pubsub"
+	"github.com/joho/godotenv"
 )
 
 func main() {
-	ctx := context.Background()
-	projectID := "reystaging"
-
-	client, err := pubsub.NewClient(ctx, projectID)
+	err := godotenv.Load()
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal("Error loading .env file")
 		os.Exit(1)
 	}
 
-	topic := client.Topic("payment-created")
-	isExist, _ := topic.Exists(ctx)
-
-	fmt.Println(isExist)
-
+	if errClient := InitializePubsubClient(); errClient != nil {
+		log.Fatal(errClient)
+		os.Exit(1)
+	}
 }

@@ -1,0 +1,9 @@
+topic: send-email
+subscribers:
+  - service: rey-notif
+    dead_letter: 5
+    ack: 10
+    retry: 10,600
+    ordering: true
+    is_active: true
+is_active: true

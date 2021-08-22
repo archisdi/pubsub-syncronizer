@@ -17,3 +17,4 @@ storage/*
 
 main
 coverage.*
+*-credential.json
