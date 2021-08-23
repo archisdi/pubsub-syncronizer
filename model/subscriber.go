@@ -59,7 +59,8 @@ func (s *Subscriber) getSubscriptionName(topicName string) (string, error) {
 
 func (s *Subscriber) createConfig(topic *pubsub.Topic) pubsub.SubscriptionConfig {
 	config := pubsub.SubscriptionConfig{
-		Topic: topic,
+		Topic:            topic,
+		ExpirationPolicy: time.Duration(0), // never expires
 	}
 
 	if s.Ordering != nil {
@@ -82,7 +83,9 @@ func (s *Subscriber) createConfig(topic *pubsub.Topic) pubsub.SubscriptionConfig
 }
 
 func (s *Subscriber) createUpdateConfig() pubsub.SubscriptionConfigToUpdate {
-	config := pubsub.SubscriptionConfigToUpdate{}
+	config := pubsub.SubscriptionConfigToUpdate{
+		ExpirationPolicy: time.Duration(0), // never expires
+	}
 
 	if s.Deadline != nil {
 		config.AckDeadline = s.getAckDeadline()

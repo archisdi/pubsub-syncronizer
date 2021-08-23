@@ -1,22 +1,30 @@
 package main
 
 import (
+	"flag"
 	"io/ioutil"
 	"log"
 	"os"
 	"reypubsub/model"
 	"reypubsub/module"
+	"strings"
 
 	"github.com/joho/godotenv"
 	"gopkg.in/yaml.v2"
 )
 
-func loadEvents() ([]model.Event, error) {
+func loadEvents(topic string) ([]model.Event, error) {
 	var events []model.Event
 	files, _ := ioutil.ReadDir("./events")
 
 	for _, file := range files {
 		yamlFile, errYaml := ioutil.ReadFile("./events/" + file.Name())
+
+		// Filter topic to match flag
+		if topic != "all" && topic != strings.Split(file.Name(), ".")[0] {
+			continue
+		}
+
 		if errYaml != nil {
 			return nil, errYaml
 		}
@@ -48,18 +56,17 @@ func main() {
 		logErrorAndExit(errClient)
 	}
 
-	events, errEvents := loadEvents()
+	topicFlag := flag.String("topic", "all", "to filter topic")
+	flag.Parse()
+
+	events, errEvents := loadEvents(*topicFlag)
 	if errEvents != nil {
 		logErrorAndExit(errEvents)
 	}
 
 	// enforce dead letter topic
-	deadLetterPrefix := "handler"
 	deadLetter := model.Event{
 		Topic: "dead-letter",
-		Subscribers: []model.Subscriber{{
-			Service: &deadLetterPrefix,
-		}},
 	}
 	deadLetter.Sync()
 
